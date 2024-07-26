@@ -3,7 +3,6 @@ interface Device {
     isEnable(): boolean,
     enable(): void,
     disable(): void,
-
 }
 
 class TV implements Device {
