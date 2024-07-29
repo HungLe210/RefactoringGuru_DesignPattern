@@ -30,7 +30,6 @@ class BubbleSort implements SortStrategy {
 class QuickSort implements SortStrategy {
     protected count: number = 0;
     public sort(data: number[]): number[] {
-
         console.log('Sorting using Quick Sort');
         if (data.length <= 1) {
             return data;
