@@ -3,12 +3,12 @@ interface Command {
 }
 
 class Light {
-    private color: string = 'White'
+    private color: string | undefined;
     public turnOn(): void {
-        console.log(`${this.color} Light is on!`);
+        console.log(`${this.color ? this.color : ''} Light is on!`);
     }
     public turnOff(): void {
-        console.log("Light is off!");
+        console.log(`${this.color ? this.color : ''} Light is off!`);
     }
     public setColor(color: string): void {
         this.color = color;
@@ -17,20 +17,22 @@ class Light {
 
 class LightOnCommand implements Command {
     private light: Light;
-    private color: string;
-    constructor(light: Light, color: string) {
+    private color: string = '';
+    constructor(light: Light, color?: string) {
         this.light = light;
-        this.color = color;
+        if (color)
+            this.color = color;
 
     }
     public execute(): void {
-        this.light.turnOn();
         this.light.setColor(this.color);
+        this.light.turnOn();
     }
 }
 
 class LightOffCommand implements Command {
     private light: Light;
+    private color: string | undefined;
     constructor(light: Light) {
         this.light = light;
     }
@@ -50,20 +52,17 @@ class RemoteControl {  //Invoker
     }
 }
 
-function clientCode() {
-    const light = new Light();
 
-    //config command 
-    const lightOn = new LightOnCommand(light, "Red");
-    const lightOff = new LightOffCommand(light);
+const light = new Light();
 
-    const remote = new RemoteControl();
+//config command 
+const lightOn = new LightOnCommand(light, "RED");
+const lightOff = new LightOffCommand(light);
 
-    remote.setCommand(lightOn);
-    remote.pressButton();
+const remote = new RemoteControl();
 
-    remote.setCommand(lightOff);
-    remote.pressButton();
-}
+remote.setCommand(lightOn);
+remote.pressButton();
+remote.setCommand(lightOff);
+remote.pressButton();
 
-clientCode();

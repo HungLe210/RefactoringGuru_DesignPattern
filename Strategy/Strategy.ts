@@ -77,4 +77,4 @@ sorter.setStrategy(new QuickSort());
 console.log('Sorted Data:', sorter.sort(data));
 
 sorter.setStrategy(new BubbleSortDescending());
-console.log('Sorted Data:', sorter.sort(data));
+console.log('Sorted Descending Data:', sorter.sort(data));
