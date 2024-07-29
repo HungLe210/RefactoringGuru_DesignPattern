@@ -1,77 +1,62 @@
-class Originator {
-    private state: string;
-
-    constructor(state: string) {
-        this.state = state;
-        console.log(`Originator: My initial state is: ${state}`);
-    }
-    public doSomething(): void {
-        console.log('Originator: I\'m doing something important.');
-        this.state = this.generateRandomString(30);
-        console.log(`Originator: and my state has changed to: ${this.state}`);
-    }
-
-    private generateRandomString(length: number = 10): string {
-        const charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        return Array
-            .apply(null, { length })
-            .map(() => charSet.charAt(Math.floor(Math.random() * charSet.length)))
-            .join('');
-    }
-
-    public save(): Memento {
-        return new ConcreteMemento(this.state);
-    }
-
-    public restore(memento: Memento): void {
-        this.state = memento.getState();
-        console.log(`Originator: My state has changed to: ${this.state}`);
-    }
-}
-
 interface Memento {
     getState(): string;
-
     getName(): string;
-
     getDate(): string;
 }
 
-class ConcreteMemento implements Memento {
+class ConcreateMemento implements Memento {
     private state: string;
-
     private date: string;
 
     constructor(state: string) {
         this.state = state;
-        this.date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        this.date = new Date().toISOString();
     }
-
 
     public getState(): string {
         return this.state;
     }
 
     public getName(): string {
-        return `${this.date} / (${this.state.substr(0, 9)}...)`;
+        return `${this.date} / (${this.state.substring(0, 9)}...)`;
     }
 
     public getDate(): string {
         return this.date;
     }
 }
-class Caretaker {
-    private mementos: Memento[] = [];
 
-    private originator: Originator;
 
-    constructor(originator: Originator) {
-        this.originator = originator;
+//Originator Class
+class TextEditor {
+    private state: string;
+    constructor(state: string = '') {
+        this.state = state;
+    }
+    public type(words: string): void {
+        this.state += words;
     }
 
-    public backup(): void {
-        console.log('\nCaretaker: Saving Originator\'s state...');
+    public save(): Memento {
+        return new ConcreateMemento(this.state);
+    }
+    public restore(memento: Memento): void {
+        this.state = memento.getState();
+    }
+    public getState(): string {
+        return this.state;
+    }
+}
+
+class customHistory {
+    private mementos: Memento[] = [];
+    private originator: TextEditor;
+
+    constructor(originator: TextEditor) {
+        this.originator = originator;
+    }
+    public save(): void {
+        console.log('History: Saving state...');
         this.mementos.push(this.originator.save());
     }
 
@@ -79,38 +64,35 @@ class Caretaker {
         if (!this.mementos.length) {
             return;
         }
-        let memento !: Memento;
-        memento != this.mementos.pop();
-
-        console.log(`Caretaker: Restoring state to: ${memento.getName()}`);
-        this.originator.restore(memento);
+        const memento: Memento | undefined = this.mementos.pop();
+        if (memento) {
+            console.log('History : Restoring state...');
+            this.originator.restore(memento)
+        }
     }
 
     public showHistory(): void {
-        console.log('Caretaker: Here\'s the list of mementos:');
+        console.log('History: Here\'s the list of mementos');
         for (const memento of this.mementos) {
             console.log(memento.getName());
         }
     }
 }
 
-const originator = new Originator('Super-duper-super-puper-super.');
-const caretaker = new Caretaker(originator);
+const editor = new TextEditor();
+const customhistory = new customHistory(editor);
 
-caretaker.backup();
-originator.doSomething();
+editor.type('Hello, ');
+customhistory.save();
 
-caretaker.backup();
-originator.doSomething();
+editor.type('world!');
+customhistory.save();
 
-caretaker.backup();
-originator.doSomething();
+editor.type(' This is an example of Memento Pattern.');
+console.log('Current State:', editor.getState());
 
-console.log('');
-caretaker.showHistory();
+customhistory.undo();
+console.log('State after undo:', editor.getState());
 
-console.log('\nClient: Now, let\'s rollback!\n');
-caretaker.undo();
-
-console.log('\nClient: Once more!\n');
-caretaker.undo();
+customhistory.undo();
+console.log('State after another undo:', editor.getState());
