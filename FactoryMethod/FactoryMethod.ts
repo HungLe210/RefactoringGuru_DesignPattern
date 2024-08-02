@@ -75,6 +75,7 @@ function clientCode(creator: Creator) {
 console.log('App : Launched with A_Creator.');
 clientCode(new A_Creator());
 
-
+const a = new A_Creator();
+a.mainOperation();
 console.log('App : Launched with B_Creator.');
 clientCode(new B_Creator());
